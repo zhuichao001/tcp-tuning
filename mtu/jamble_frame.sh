@@ -9,6 +9,5 @@ ifconfig eth0 mtu 9000 up
 
 #permanently
 echo 'MTU 9000' >> /etc/network/interfaces
-
 systemctl restart network
 
