@@ -3,16 +3,13 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <string.h> 
+#include <errno.h> 
 #include <sys/socket.h> 
 #include<netinet/in.h>
 #include<arpa/inet.h>
 
 
-#define MAX 80 
-#define PORT 8080 
-#define SA struct sockaddr 
-
-void set_nolinger(int sfd){
+void set_socket_nolinger(int sfd) {
     struct linger linger;
     linger.l_onoff = 1;
     linger.l_linger = 2;
@@ -20,64 +17,60 @@ void set_nolinger(int sfd){
 }
 
 
-void func2(int sockfd) 
-{ 
-    char buff[MAX]; 
-    int n; 
+struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
+    struct sockaddr_in *svraddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
+    memset(svraddr, 0, sizeof(struct sockaddr_in));
+    svraddr->sin_family = AF_INET;
+    svraddr->sin_addr.s_addr = inet_addr(ip);
+    svraddr->sin_port = htons(port);
+    return svraddr;
+}
 
+
+void print_errno(const char * prefix) {
+     printf("%s socket error: %s(errno: %d)\n", prefix, strerror(errno), errno);
+     exit (0);
+}
+
+
+void exchange(int sockfd) { 
     for (;;) { 
-        bzero(buff, sizeof(buff)); 
-        printf("Enter the string : "); 
-        n = 0; 
-        while ((buff[n++] = getchar()) != '\n') 
-            ; 
+        char buff[128]; 
+        int n=0; 
+
+        printf("Enter: "); 
+        while ((buff[n++] = getchar()) != '\n'); 
+        buff[n]=0;
+
         write(sockfd, buff, sizeof(buff)); 
-        bzero(buff, sizeof(buff)); 
+
         int err = read(sockfd, buff, sizeof(buff)); 
-        printf("From Server : %s, err=%d\n", buff, err); 
+        if(err<=0){
+            print_errno("read");
+        }
+
+        printf("From Server : %s\n", buff); 
         if ((strncmp(buff, "exit", 4)) == 0) { 
             printf("Client Exit...\n"); 
             break; 
         } 
-        break;
     } 
-    sleep(1);
     close(sockfd); 
 } 
   
-int main() 
-{ 
-    int sockfd, connfd; 
-    struct sockaddr_in servaddr, cli; 
-  
-    // socket create and varification 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+int main() { 
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0); 
     if (sockfd == -1) { 
-        printf("socket creation failed...\n"); 
-        exit(0); 
+        print_errno("socket");
     } 
-    else
-        printf("Socket successfully created..\n"); 
-    bzero(&servaddr, sizeof(servaddr)); 
 
-  
-    set_nolinger(sockfd);
+    set_socket_nolinger(sockfd);
 
-    // assign IP, PORT 
-    servaddr.sin_family = AF_INET; 
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
-    servaddr.sin_port = htons(PORT); 
-  
-    // connect the client socket to server socket 
-    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) { 
-        printf("connection with the server failed...\n"); 
-        exit(0); 
+    struct sockaddr_in * svraddr = gen_svraddr("127.0.0.1", 8080); 
+    if (connect(sockfd, (struct sockaddr *)svraddr, sizeof(*svraddr)) != 0) { 
+        print_errno("connect");
     } 
-    else
-        printf("connected to the server..\n"); 
-  
-    // function for chat 
-    func2(sockfd); 
-  
-    sleep(100);
+
+    printf("connected to the server..\n"); 
+    exchange(sockfd); 
 } 
