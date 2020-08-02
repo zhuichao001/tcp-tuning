@@ -11,7 +11,7 @@
 #include <arpa/inet.h>
 
 
-void set_socket_nolinger(int sfd) {
+void set_socket_linger(int sfd) {
     struct linger linger;
     linger.l_onoff = 1;
     linger.l_linger = 0;
@@ -64,8 +64,6 @@ int main() {
         print_errno("socket");
     } 
   
-    set_socket_nolinger(sockfd);
-
     struct sockaddr_in * svraddr = gen_svraddr("127.0.0.1", 8080); 
     if ((bind(sockfd, (struct sockaddr *)svraddr, sizeof(*svraddr))) != 0) { 
         print_errno("bind");
@@ -82,9 +80,9 @@ int main() {
         print_errno("accept");
     } 
 
-    set_socket_nolinger(connfd);
+    set_socket_linger(connfd);
     serve(connfd); 
 
     printf("close client...\n"); 
     sleep(1000);
-} 
+}
