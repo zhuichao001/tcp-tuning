@@ -9,10 +9,10 @@
 #include<arpa/inet.h>
 
 
-void set_socket_nolinger(int sfd) {
+void set_socket_linger(int sfd) {
     struct linger linger;
-    linger.l_onoff = 1;
-    linger.l_linger = 2;
+    linger.l_onoff = 1; //1 open, 0 close
+    linger.l_linger = 2; //delay 2 seconds
     setsockopt(sfd, SOL_SOCKET, SO_LINGER, (const char *) &linger, sizeof(linger));
 }
 
@@ -64,7 +64,7 @@ int main() {
         print_errno("socket");
     } 
 
-    set_socket_nolinger(sockfd);
+    set_socket_linger(sockfd);
 
     struct sockaddr_in * svraddr = gen_svraddr("127.0.0.1", 8080); 
     if (connect(sockfd, (struct sockaddr *)svraddr, sizeof(*svraddr)) != 0) { 
