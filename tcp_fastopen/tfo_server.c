@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 
 
-struct sockaddr_in * gen_svraddr(const char *ip, const int port){
+struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
     struct sockaddr_in *svraddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
     memset (svraddr, 0, sizeof(struct sockaddr_in));
     svraddr->sin_family = AF_INET;
@@ -20,13 +20,13 @@ struct sockaddr_in * gen_svraddr(const char *ip, const int port){
 }
 
 
-void print_errno(const char * prefix){
+void print_errno(const char * prefix) {
      printf("%s socket error: %s(errno: %d)\n", prefix, strerror(errno), errno);
      exit (0);
 }
 
 
-void tfo_server(){
+void tfo_server() {
     int listenfd;
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         print_errno("create");
@@ -56,7 +56,7 @@ void tfo_server(){
         
         char recv_buf[1024];
         recv(fd, recv_buf, sizeof(recv_buf), 0);
-        printf("=====> recv: %s\n", recv_buf);
+        printf("|=====> recv: %s\n", recv_buf);
         close(fd);
     }
 }

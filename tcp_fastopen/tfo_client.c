@@ -5,11 +5,11 @@
 #include <errno.h> 
 #include <string.h> 
 #include <sys/socket.h> 
-#include<netinet/in.h>
-#include<arpa/inet.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 
-struct sockaddr_in * gen_svraddr(const char *ip, const int port){
+struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
     struct sockaddr_in *svraddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
     memset(svraddr, 0, sizeof(struct sockaddr_in));
     svraddr->sin_family = AF_INET;
@@ -19,13 +19,13 @@ struct sockaddr_in * gen_svraddr(const char *ip, const int port){
 }
 
 
-void print_errno(const char * prefix){
+void print_errno(const char * prefix) {
      printf("%s socket error: %s(errno: %d)\n", prefix, strerror(errno), errno);
      exit (0);
 }
 
 
-void tfo_client(){
+void tfo_client() {
     int sockfd;
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         print_errno("create");
