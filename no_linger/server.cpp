@@ -36,55 +36,55 @@ void print_errno(const char * prefix) {
 
 
 void serve(int sockfd) { 
-	for (;;) { 
+    for (;;) { 
         char buff[128]={0,}; 
 
-		int err = read(sockfd, buff, sizeof(buff)); 
+        int err = read(sockfd, buff, sizeof(buff)); 
         if(err<=0){
             print_errno("read");
         }
 
         int n=0; 
-		printf("From client: %s\n", buff); 
-		while ((buff[n++] = getchar()) != '\n') ; 
+        printf("From client: %s\n", buff); 
+        while ((buff[n++] = getchar()) != '\n') ; 
         buff[n]=0;
 
-		write(sockfd, buff, sizeof(buff)); 
+        write(sockfd, buff, sizeof(buff)); 
 
-		if (strncmp("exit", buff, 4) == 0) { 
-			printf("Server Exit...\n"); 
-			break; 
-		} 
-	}
+        if (strncmp("exit", buff, 4) == 0) { 
+            printf("Server Exit...\n"); 
+            break; 
+        } 
+    }
 } 
 
 int main() { 
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-	if (sockfd < 0) { 
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+    if (sockfd < 0) { 
         print_errno("socket");
-	} 
+    } 
   
     set_socket_nolinger(sockfd);
 
     struct sockaddr_in * svraddr = gen_svraddr("127.0.0.1", 8080); 
-	if ((bind(sockfd, (struct sockaddr *)svraddr, sizeof(*svraddr))) != 0) { 
+    if ((bind(sockfd, (struct sockaddr *)svraddr, sizeof(*svraddr))) != 0) { 
         print_errno("bind");
-	} 
+    } 
 
-	if ((listen(sockfd, 5)) != 0) { 
+    if ((listen(sockfd, 5)) != 0) { 
         print_errno("listen");
-	} 
+    } 
 
-	struct sockaddr_in cliaddr; 
-	int addrlen = sizeof(cliaddr);
-	int connfd = accept(sockfd, (struct sockaddr *)&cliaddr, (socklen_t*)&addrlen); 
-	if (connfd < 0) { 
+    struct sockaddr_in cliaddr; 
+    int addrlen = sizeof(cliaddr);
+    int connfd = accept(sockfd, (struct sockaddr *)&cliaddr, (socklen_t*)&addrlen); 
+    if (connfd < 0) { 
         print_errno("accept");
-	} 
+    } 
 
     set_socket_nolinger(connfd);
-	serve(connfd); 
+    serve(connfd); 
 
-	printf("close client...\n"); 
+    printf("close client...\n"); 
     sleep(1000);
 } 
