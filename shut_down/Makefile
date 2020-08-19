@@ -1,4 +1,4 @@
 all:
-	g++ -o client client.cpp
+	g++ -o client client.c
 clean:
 	rm -f client

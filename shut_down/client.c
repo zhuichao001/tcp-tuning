@@ -35,7 +35,7 @@ int process(int sockfd) {
     printf("Close write pipe after sending:%s \n", line);
     shutdown(sockfd, SHUT_WR);
 
-    sleep(3); //do other thing
+    sleep(1); //do other thing
 
     int bytes;  
     char buf[256] = {0,};
@@ -60,5 +60,6 @@ int main(int argc, char *argv[]) {
     }
 
     process(sockfd);
+    sleep(300);
     return 0;
 }
