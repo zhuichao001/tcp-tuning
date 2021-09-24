@@ -7,66 +7,54 @@
 #include <errno.h> 
 #include <sys/types.h> 
 #include <sys/socket.h> 
+#include <sys/wait.h> 
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <thread> 
+#include "common/address.h"
 
 
-void set_reuse_addr(int sfd) {
+//linux-kernel-3.9 feature: SO_REUSEPORT
+void set_reuse_port(int sfd) {
     int reuse = 1;
-    socklen_t socklen = sizeof(reuse);
-    setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT, &reuse, socklen);
+    setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(int));
 }
-
-
-struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
-    struct sockaddr_in *svraddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
-    memset(svraddr, 0, sizeof(struct sockaddr_in));
-    svraddr->sin_family = AF_INET;
-    svraddr->sin_addr.s_addr = inet_addr(ip);
-    svraddr->sin_port = htons(port);
-    return svraddr;
-}
-
 
 void print_errno(const char * prefix) {
      printf("%s socket error: %s(errno: %d)\n", prefix, strerror(errno), errno);
      exit (0);
 }
 
-
-void serve(int sockfd) { 
+void work(int fd) { 
     for (;;) { 
         char buff[128]={0,}; 
 
-        int err = read(sockfd, buff, sizeof(buff)); 
+        int err = read(fd, buff, sizeof(buff)); 
         if(err<=0){
             print_errno("read");
         }
+        printf("read from fd@%d : %s", err, buff);
 
-        int n=0; 
-        printf("From client: %s\n", buff); 
-        while ((buff[n++] = getchar()) != '\n') ; 
-        buff[n]=0;
-
-        write(sockfd, buff, sizeof(buff)); 
-
-        if (strncmp("exit", buff, 4) == 0) { 
-            printf("Server Exit...\n"); 
+        if (strncmp("[EXIT]", buff, 6) == 0) { 
+            printf("\nClient %d Exit...\n", fd); 
             break; 
         } 
+
+        int n=err; 
+        write(fd, buff, n); 
     }
 } 
 
-int main() { 
+int server() { 
     int sockfd = socket(AF_INET, SOCK_STREAM, 0); 
     if (sockfd < 0) { 
         print_errno("socket");
     } 
 
-    set_reuse_addr(sockfd);
+    set_reuse_port(sockfd);
 
-    struct sockaddr_in *svraddr = gen_svraddr("0.0.0.0", 8080); 
-    if ((bind(sockfd, (struct sockaddr *)svraddr, sizeof(*svraddr))) != 0) { 
+    struct sockaddr *svraddr = create_ipv4_addr("0.0.0.0", 8080); 
+    if ((bind(sockfd, svraddr, sizeof(struct sockaddr_in))) != 0) { 
         print_errno("bind");
     } 
   
@@ -76,17 +64,52 @@ int main() {
 
     struct sockaddr_in cliaddr; 
     int addrlen = sizeof(cliaddr);
-    while(1){
-        int connfd = accept(sockfd, (struct sockaddr *)&cliaddr, (socklen_t*)&addrlen); 
-        if (connfd < 0) { 
+    while(true){
+        int fd = accept(sockfd, (struct sockaddr *)&cliaddr, (socklen_t*)&addrlen); 
+        if (fd < 0) { 
             print_errno("accept");
-        } else {
-            printf("accept conn:%d\n", connfd);
         } 
+        printf("accept conn:%d\n", fd);
+        std::thread h(work, fd);
+        h.detach();
     }
-
-    //serve(connfd); 
 
     printf("close ...\n"); 
     sleep(1000);
+    return 0;
+}
+
+void wait_childs(){
+    while (1) {
+        pid_t ret = wait(NULL);
+        if (ret == -1) {
+            if (errno == EINTR) {
+                continue;
+            } if (errno == ECHILD) {
+                fprintf(stderr, "wait error:%s\n", strerror(errno));
+                continue;
+            }
+            break;
+        }
+    }
+
+}
+
+int main(){
+    for(int i = 0; i < 4; i++) {
+        pid_t pid = fork();
+        if (pid > 0 ) {
+            continue;
+        } else if (pid == 0) {
+            server();
+            exit(0);
+        } else if (pid < 0) {
+            printf("fork error");
+            exit(1);
+        }
+    }
+
+    wait_childs();
+
+    return 0;
 }

@@ -16,7 +16,6 @@ struct sockaddr * create_unix_domain(const char *filename) {
     struct sockaddr_un *addr = (struct sockaddr_un *) malloc(sizeof(struct sockaddr_un));
     memset(addr, 0, sizeof(struct sockaddr_un));
     addr->sun_family = AF_UNIX;
-    //unlink(filename);
     strcpy(addr->sun_path, filename);
     return (struct sockaddr *)addr;
 }

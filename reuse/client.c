@@ -10,8 +10,6 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 
-
-
 struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
     struct sockaddr_in *svraddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
     memset (svraddr, 0, sizeof(struct sockaddr_in));
@@ -21,24 +19,10 @@ struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
     return svraddr;
 }
 
-
 void print_errno(const char * prefix) {
      printf("%s socket error: %s(errno: %d)\n", prefix, strerror(errno), errno);
      exit (0);
 }
-
-
-void handle(int sockfd) {
-    for (int i=0; i<8; i++) {
-        char line[128];
-        sprintf(line, "tcp tuning nodelay, seq:%d\n\0", i);
-        if (send(sockfd, line, strlen(line), 0) == -1) {
-            print_errno("send");
-        }
-    }
-    printf("After sending 8 lines.\n");
-}
-
 
 int main(int argc, char *argv[]) {
     int sockfd;  
@@ -51,7 +35,34 @@ int main(int argc, char *argv[]) {
         print_errno("connect");
     }
 
-    sleep(300);
+
+    {
+        char line[128] = {0,};
+        sprintf(line, "tcp test data.\n");
+        if (send(sockfd, line, strlen(line), 0) == -1) {
+            print_errno("send");
+        }
+    }
+
+    {
+        char line[128] = {0,};
+        int n;
+        if ((n=recv(sockfd, line, 128, 0)) == -1) {
+            print_errno("recv");
+        }
+        printf("receive: %.*s\n", n, line);
+    }
+
+    {
+        char line[128] = {0,};
+        sprintf(line, "[EXIT]");
+        if (send(sockfd, line, strlen(line), 0) == -1) {
+            print_errno("send");
+        }
+    }
+
+    sleep(1);
     close(sockfd);
+
     return 0;
 }

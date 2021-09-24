@@ -9,22 +9,13 @@
 #include <sys/socket.h> 
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <thread> 
+#include "common/address.h"
 
 
 void set_reuse_addr(int sfd) {
     int reuse = 1;
-    socklen_t socklen = sizeof(reuse);
-    setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &reuse, socklen);
-}
-
-
-struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
-    struct sockaddr_in *svraddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
-    memset(svraddr, 0, sizeof(struct sockaddr_in));
-    svraddr->sin_family = AF_INET;
-    svraddr->sin_addr.s_addr = inet_addr(ip);
-    svraddr->sin_port = htons(port);
-    return svraddr;
+    setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int));
 }
 
 
@@ -34,28 +25,25 @@ void print_errno(const char * prefix) {
 }
 
 
-void serve(int sockfd) { 
-    for (;;) { 
-        char buff[128]={0,}; 
+void work(int fd) {
+    for (;;) {
+        char buff[128]={0,};
 
-        int err = read(sockfd, buff, sizeof(buff)); 
+        int err = read(fd, buff, sizeof(buff));
         if(err<=0){
             print_errno("read");
         }
+        printf("read from fd@%d : %s", err, buff);
 
-        int n=0; 
-        printf("From client: %s\n", buff); 
-        while ((buff[n++] = getchar()) != '\n') ; 
-        buff[n]=0;
+        if (strncmp("[EXIT]", buff, 6) == 0) {
+            printf("\nClient %d Exit...\n", fd); 
+            break;
+        }
 
-        write(sockfd, buff, sizeof(buff)); 
-
-        if (strncmp("exit", buff, 4) == 0) { 
-            printf("Server Exit...\n"); 
-            break; 
-        } 
+        int n=err;
+        write(fd, buff, n);
     }
-} 
+}
 
 int main() { 
     int sockfd = socket(AF_INET, SOCK_STREAM, 0); 
@@ -65,8 +53,8 @@ int main() {
 
     set_reuse_addr(sockfd);
 
-    struct sockaddr_in *svraddr = gen_svraddr("0.0.0.0", 8080); 
-    if ((bind(sockfd, (struct sockaddr *)svraddr, sizeof(*svraddr))) != 0) { 
+    struct sockaddr *svraddr = create_ipv4_addr("0.0.0.0", 8080); 
+    if ((bind(sockfd, svraddr, sizeof(struct sockaddr_in))) != 0) { 
         print_errno("bind");
     } 
   
@@ -76,12 +64,15 @@ int main() {
 
     struct sockaddr_in cliaddr; 
     int addrlen = sizeof(cliaddr);
-    int connfd = accept(sockfd, (struct sockaddr *)&cliaddr, (socklen_t*)&addrlen); 
-    if (connfd < 0) { 
-        print_errno("accept");
-    } 
-
-    serve(connfd); 
+    while(1){
+        int fd = accept(sockfd, (struct sockaddr *)&cliaddr, (socklen_t*)&addrlen); 
+        if (fd < 0) { 
+            print_errno("accept");
+        } 
+        printf("accept conn:%d\n", fd);
+        std::thread h(work, fd);
+        h.detach();
+    }
 
     printf("close ...\n"); 
     sleep(1000);
