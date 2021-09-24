@@ -9,28 +9,17 @@
 #include <netinet/in.h> 
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include "common/address.h"
 
 
 void set_tcp_defer_accept(int sockfd, int timeout) {
     setsockopt(sockfd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, sizeof(timeout));
 }
 
-
-struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
-    struct sockaddr_in *svraddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
-    memset (svraddr, 0, sizeof(struct sockaddr_in));
-    svraddr->sin_family = AF_INET;
-    svraddr->sin_addr.s_addr = inet_addr(ip);
-    svraddr->sin_port = htons(port);
-    return svraddr;
-}
-
-
 void print_errno(const char * prefix) {
      printf("%s socket error: %s(errno: %d)\n", prefix, strerror(errno), errno);
      exit (0);
 }
-
 
 int main(int argc, char *argv[]) {
     int sockfd;  
@@ -40,15 +29,16 @@ int main(int argc, char *argv[]) {
 
     set_tcp_defer_accept(sockfd, 5);
 
-    struct sockaddr_in * svraddr = gen_svraddr("127.0.0.1", 9898); 
+    struct sockaddr *svraddr = create_ipv4_addr("127.0.0.1", 9898); 
 
-    if (connect(sockfd, (struct sockaddr *)svraddr, sizeof(struct sockaddr)) == -1) {
+    if (connect(sockfd, svraddr, sizeof(struct sockaddr_in)) == -1) {
         print_errno("connect");
     }
 
-    sleep(120);
+    sleep(10);
+
     while (1) {
-        char line[] = "tcp tuning KEEP_ALIVE.";
+        char line[] = "tcp tuning test defer-accept.";
         if (send(sockfd, line, sizeof(line), 0) == -1) {
             print_errno("send");
         }
