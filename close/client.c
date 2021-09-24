@@ -9,16 +9,7 @@
 #include <netinet/in.h> 
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-
-
-struct sockaddr_in * gen_svraddr(const char *ip, const int port) {
-    struct sockaddr_in *svraddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
-    memset (svraddr, 0, sizeof(struct sockaddr_in));
-    svraddr->sin_family = AF_INET;
-    svraddr->sin_addr.s_addr = inet_addr(ip);
-    svraddr->sin_port = htons(port);
-    return svraddr;
-}
+#include "common/address.h"
 
 
 void print_errno(const char * prefix) {
@@ -26,20 +17,20 @@ void print_errno(const char * prefix) {
      exit (0);
 }
 
-
 //if recv buf is not empty, send RST
 int process(int sockfd) {
-    int bytes;  
     char buf[256] = {0,};
-    if ((bytes=recv(sockfd, buf, 256, 0)) == -1) {
+    int n;  
+    if ((n=recv(sockfd, buf, 256, 0)) == -1) {
         print_errno("recv");
+        return -1;
     }
     printf("receive: %s\n", buf);
 
     sleep(10);
     close(sockfd);
+    return 0;
 }
-
 
 int main(int argc, char *argv[]) {
     int sockfd;  
@@ -47,9 +38,9 @@ int main(int argc, char *argv[]) {
         print_errno("socket");
     }
 
-    struct sockaddr_in * svraddr = gen_svraddr("127.0.0.1", 9996); 
+    struct sockaddr *svraddr = create_ipv4_addr("127.0.0.1", 9996); 
 
-    if (connect(sockfd, (struct sockaddr *)svraddr, sizeof(struct sockaddr)) == -1) {
+    if (connect(sockfd, svraddr, sizeof(struct sockaddr_in)) == -1) {
         print_errno("connect");
     }
 
