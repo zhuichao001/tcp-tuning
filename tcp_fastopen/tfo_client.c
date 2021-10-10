@@ -33,6 +33,7 @@ void tfo_client() {
  
     struct sockaddr_in * svraddr = gen_svraddr("127.0.0.1", 8766); 
     char buf[] = "hello, coming TFO data.";
+    //MSG_FASTOPEN supported from RFC-7413
     if (sendto(sockfd, buf, strlen(buf), MSG_FASTOPEN, (struct sockaddr *)svraddr, sizeof(*svraddr)) < 0) {
         printf ("send msg error: %s(errno: %d)\n", strerror (errno), errno);
     }
