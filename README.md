@@ -24,14 +24,14 @@ net.core.wmem_max       = 16777216
 
 #### 建立连接
 ```
-net.ipv4.tcp_fastopen       = 3
-net.ipv4.tcp_syn_retries    = 3
-net.ipv4.tcp_synack_retries = 2
+net.ipv4.tcp_fastopen           = 3
+net.ipv4.tcp_syn_retries        = 3
+net.ipv4.tcp_synack_retries     = 2
 
 net.core.somaxconn              = 16384
 net.ipv4.tcp_max_syn_backlog    = 16384
 net.ipv4.tcp_abort_on_overflow  = 1
-net.ipv4.tcp_syncookies     = 1
+net.ipv4.tcp_syncookies         = 1
 ```
 *TCP Backlog队列实际值 = min(tcp_max_syn_backlog, somaxconn, 应用层设置的backlog)*
 
