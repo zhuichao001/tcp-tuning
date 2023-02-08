@@ -7,41 +7,42 @@ net.ipv4.{option} = /proc/sys/net/ipv4/{option}
 ```
 #设置可分配端口范围
 net.ipv4.ip_local_port_range = 9000 65000
-#TODO
+#内核从NIC收到包后,交由协议栈(如IP、TCP)处理之前的缓冲队列长度
 net.core.netdev_max_backlog = 16384
 ```
 
 #### 缓冲区大小
 ```
-net.ipv4.tcp_wmem   = 4096      65536   16777216
-net.ipv4.tcp_rmem   = 4096      327680  16777216
-net.ipv4.tcp_mem    = 327680    327680  16777216
+net.ipv4.tcp_wmem       = 4096      65536       16777216
+net.ipv4.tcp_rmem       = 4096      327680      16777216
+net.ipv4.tcp_mem        = 327680    327680      16777216
 net.core.rmem_default   = 327680
 net.core.wmem_default   = 65536
-net.core.rmem_max   = 16777216
-net.core.wmem_max   = 16777216
+net.core.rmem_max       = 16777216
+net.core.wmem_max       = 16777216
 ```
 
 #### 建立连接
 ```
-net.ipv4.tcp_fastopen = 3
-net.ipv4.tcp_syn_retries = 3
+net.ipv4.tcp_fastopen       = 3
+net.ipv4.tcp_syn_retries    = 3
 net.ipv4.tcp_synack_retries = 2
 
-net.core.somaxconn = 16384
-net.ipv4.tcp_max_syn_backlog = 16384
-net.ipv4.tcp_abort_on_overflow = 1
-net.ipv4.tcp_syncookies = 1
+net.core.somaxconn              = 16384
+net.ipv4.tcp_max_syn_backlog    = 16384
+net.ipv4.tcp_abort_on_overflow  = 1
+net.ipv4.tcp_syncookies     = 1
 ```
 *TCP Backlog队列实际值 = min(tcp_max_syn_backlog, somaxconn, 应用层设置的backlog)*
 
 #### 连接保持
 ```
-net.ipv4.tcp_keepalive_time = 600
-net.ipv4.tcp_keepalive_probes = 3
-net.ipv4.tcp_keepalive_intvl = 15
-net.ipv4.tcp_retries2 = 5
+net.ipv4.tcp_keepalive_time     = 600
+net.ipv4.tcp_keepalive_probes   = 3
+net.ipv4.tcp_keepalive_intvl    = 15
+net.ipv4.tcp_retries2           = 5
 net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv4.tcp_no_delay_ack       =1
 ```
 
 #### 滑动窗口&拥塞控制
@@ -57,10 +58,10 @@ net.ipv4.tcp_congestion_control = bbr
 
 #### 连接回收
 ```
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_tw_recycle = 0 #NAT网络禁用
-net.ipv4.tcp_timestamps = 0
+net.ipv4.tcp_tw_reuse       = 1
+net.ipv4.tcp_tw_recycle     = 0 #NAT网络禁用
+net.ipv4.tcp_timestamps     = 0
 
-net.ipv4.tcp_fin_timeout = 2
+net.ipv4.tcp_fin_timeout    = 2
 net.ipv4.tcp_max_tw_buckets = 6000
 ```
