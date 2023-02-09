@@ -34,7 +34,7 @@ net.ipv4.ip_local_port_range = 9000 65000
 net.core.netdev_max_backlog = 16384
 ```
 
-#### 缓冲区大小
+#### 窗口 | 缓冲区大小
 ```
 net.ipv4.tcp_mem        = 327680    327680      16777216
 net.ipv4.tcp_wmem       = 4096      65536       16777216
@@ -71,7 +71,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 net.ipv4.tcp_no_delay_ack       =1
 ```
 
-#### 滑动窗口&拥塞控制
+#### 拥塞控制
 ```
 #设置拥塞窗口大小
 ip route | while read p; do ip route change $p initcwnd 10 initrwnd 10; done
