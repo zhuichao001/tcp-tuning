@@ -14,6 +14,12 @@ systemctl -w net.core.{option} = {value}
 /etc/sysctl.conf
 ```
 
+性能验证：  
+```
+dd if=/dev/urandom of=sample.txt bs=1M count=1024 iflag=fullblock
+scp sample.txt your_username@remotehost.com:/some/remote/directory
+```
+
 #### 初始设置
 ```
 #设置可分配端口范围
