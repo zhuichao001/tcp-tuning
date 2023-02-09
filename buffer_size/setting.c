@@ -7,6 +7,7 @@
 #include<netinet/in.h>
 #include<arpa/inet.h>
 
+//https://sandilands.info/sgordon/impact-of-bandwidth-delay-product-on-tcp-throughput
 
 int get_BDP(){
     int band_width = 1024*1024;
