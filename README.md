@@ -12,6 +12,12 @@ systemctl -w net.core.{option} = {value}
 
 #永久生效需要修改:
 /etc/sysctl.conf
+
+#刷新路由信息
+sysctl -w net.ipv4.route.flush=1
+
+#生效
+sysctl -p
 ```
 
 性能验证：  
@@ -37,6 +43,9 @@ net.core.rmem_default   = 327680
 net.core.wmem_default   = 65536
 net.core.rmem_max       = 16777216
 net.core.wmem_max       = 16777216
+
+#设置网卡队列大小
+ifconfig eth0 txqueuelen 1000
 ```
 
 #### 建立连接
