@@ -1,7 +1,18 @@
 # TCP tuning
-配置项位置说明：
+配置项位置说明： 
+```
 net.core.{option} = /proc/sys/net/core/{option}
 net.ipv4.{option} = /proc/sys/net/ipv4/{option}
+```
+
+如何设置：  
+```
+#临时设置执行命令:
+systemctl -w net.core.{option} = {value}
+
+#永久生效需要修改:
+/etc/sysctl.conf
+```
 
 #### 初始设置
 ```
@@ -13,9 +24,9 @@ net.core.netdev_max_backlog = 16384
 
 #### 缓冲区大小
 ```
+net.ipv4.tcp_mem        = 327680    327680      16777216
 net.ipv4.tcp_wmem       = 4096      65536       16777216
 net.ipv4.tcp_rmem       = 4096      327680      16777216
-net.ipv4.tcp_mem        = 327680    327680      16777216
 net.core.rmem_default   = 327680
 net.core.wmem_default   = 65536
 net.core.rmem_max       = 16777216
