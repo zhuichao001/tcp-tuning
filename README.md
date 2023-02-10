@@ -1,4 +1,4 @@
-# TCP tuning
+# Linux 内核 TCP 参数调优
 配置项位置说明： 
 ```
 net.core.{option} = /proc/sys/net/core/{option}
@@ -20,10 +20,15 @@ sysctl -p
 sysctl -w net.ipv4.route.flush=1
 ```
 
-性能验证：  
+#### 性能验证：   
 ```
 dd if=/dev/urandom of=sample.txt bs=1M count=1024 iflag=fullblock
 scp sample.txt your_username@remotehost.com:/some/remote/directory
+```
+
+#### 查看统计:  
+```
+ls /sys/class/net/eth0/statistics/
 ```
 
 #### 初始设置
@@ -51,7 +56,7 @@ ifconfig eth0 txqueuelen 1000
 #### 建立连接
 ```
 net.ipv4.tcp_fastopen           = 3
-net.ipv4.tcp_syn_retries        = 3
+net.ipv4.tcp_syn_retries        = 2
 net.ipv4.tcp_synack_retries     = 2
 
 net.core.somaxconn              = 16384
@@ -66,9 +71,11 @@ net.ipv4.tcp_syncookies         = 1
 net.ipv4.tcp_keepalive_time     = 600
 net.ipv4.tcp_keepalive_probes   = 3
 net.ipv4.tcp_keepalive_intvl    = 15
+net.ipv4.tcp_retries1           = 3
 net.ipv4.tcp_retries2           = 5
-net.ipv4.tcp_slow_start_after_idle = 0
 net.ipv4.tcp_no_delay_ack       =1
+net.ipv4.tcp_low_latency        = 1
+
 ```
 
 #### 拥塞控制
@@ -76,16 +83,30 @@ net.ipv4.tcp_no_delay_ack       =1
 #设置拥塞窗口大小
 ip route | while read p; do ip route change $p initcwnd 10 initrwnd 10; done
 net.ipv4.tcp_window_scaling = 1
+
+#空间后不进入慢启动
+net.ipv4.tcp_slow_start_after_idle = 0
+
+#允许最大重排数量
+net.ipv4.tcp_reordering = 8
+
 ```
 ```
+#拥塞算法
 net.ipv4.tcp_available_congestion_control = cubic reno bbr
 net.ipv4.tcp_congestion_control = bbr
+```
+```
+#重传策略
+net.ipv4.tcp_sack = 1
+net.ipv4.tcp_fack = 1
+net.ipv4.tcp_dsack = 1
 ```
 
 #### 连接回收
 ```
 net.ipv4.tcp_tw_reuse       = 1
-net.ipv4.tcp_tw_recycle     = 0 #NAT网络禁用
+net.ipv4.tcp_tw_recycle     = 1
 net.ipv4.tcp_timestamps     = 0
 
 net.ipv4.tcp_fin_timeout    = 2
