@@ -58,8 +58,8 @@ net.ipv4.tcp_fastopen           = 3
 net.ipv4.tcp_syn_retries        = 2
 net.ipv4.tcp_synack_retries     = 2
 
-net.core.somaxconn              = 16384
-net.ipv4.tcp_max_syn_backlog    = 16384
+net.core.somaxconn              = 16384 #全连接队列
+net.ipv4.tcp_max_syn_backlog    = 16384 #半连接队列
 net.ipv4.tcp_abort_on_overflow  = 1
 net.ipv4.tcp_syncookies         = 1
 ```
@@ -72,7 +72,7 @@ net.ipv4.tcp_keepalive_probes   = 3
 net.ipv4.tcp_keepalive_intvl    = 15
 net.ipv4.tcp_retries1           = 3
 net.ipv4.tcp_retries2           = 5
-net.ipv4.tcp_no_delay_ack       =1
+net.ipv4.tcp_no_delay_ack       = 1
 net.ipv4.tcp_low_latency        = 1
 
 ```
