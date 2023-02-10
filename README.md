@@ -17,8 +17,7 @@ systemctl -w net.core.{option} = {value}
 sysctl -p
 
 ```
-> 备注：有些参数的生效需要刷新路由信息
-> sysctl -w net.ipv4.route.flush=1
+> 有些参数的生效需要刷新路由信息: sysctl -w net.ipv4.route.flush=1
 
 #### 性能验证：   
 ```
