@@ -58,14 +58,14 @@ net.ipv4.tcp_fastopen           = 3
 net.ipv4.tcp_syn_retries        = 2
 net.ipv4.tcp_synack_retries     = 2
 
+# TCP Backlog队列实际值 = min(somaxconn, tcp_max_syn_backlog, 应用层设置的backlog)
 net.core.somaxconn              = 16384 #全连接队列
 net.ipv4.tcp_max_syn_backlog    = 16384 #半连接队列
 net.ipv4.tcp_abort_on_overflow  = 1
 net.ipv4.tcp_syncookies         = 1
 ```
-*TCP Backlog队列实际值 = min(tcp_max_syn_backlog, somaxconn, 应用层设置的backlog)*
 
-#### 连接保持
+#### 连接使用
 ```
 net.ipv4.tcp_keepalive_time     = 600
 net.ipv4.tcp_keepalive_probes   = 3
@@ -74,7 +74,6 @@ net.ipv4.tcp_retries1           = 3
 net.ipv4.tcp_retries2           = 5
 net.ipv4.tcp_no_delay_ack       = 1
 net.ipv4.tcp_low_latency        = 1
-
 ```
 
 #### 拥塞控制
@@ -88,8 +87,8 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 #允许最大重排数量
 net.ipv4.tcp_reordering = 8
-
 ```
+
 ```
 #拥塞算法
 net.ipv4.tcp_available_congestion_control = cubic reno bbr
@@ -97,9 +96,9 @@ net.ipv4.tcp_congestion_control = bbr
 ```
 ```
 #重传策略
-net.ipv4.tcp_sack = 1
-net.ipv4.tcp_fack = 1
-net.ipv4.tcp_dsack = 1
+net.ipv4.tcp_sack   = 1
+net.ipv4.tcp_fack   = 1 #新版内核不再使用
+net.ipv4.tcp_dsack  = 1
 ```
 
 #### 连接回收
