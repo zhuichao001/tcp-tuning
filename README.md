@@ -5,19 +5,19 @@ net.core.{option} = /proc/sys/net/core/{option}
 net.ipv4.{option} = /proc/sys/net/ipv4/{option}
 ```
 
-如何设置：  
+#### 如何修改参数：  
 ```
-#临时设置执行命令:
+#临时设置-系统参数文件：
+echo "{SOME_VALUE}" > /proc/sys/net/ipv4/tcp_xxx
+
+#临时设置-执行命令:
 systemctl -w net.core.{option} = {value}
 
-#永久生效需要修改:
-/etc/sysctl.conf
-
-#刷新路由信息
-sysctl -w net.ipv4.route.flush=1
-
-#生效
+#永久生效-需要修改: /etc/sysctl.conf
 sysctl -p
+
+备注：有些参数的生效需要刷新路由信息
+sysctl -w net.ipv4.route.flush=1
 ```
 
 性能验证：  
