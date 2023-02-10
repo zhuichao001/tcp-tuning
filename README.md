@@ -16,9 +16,9 @@ systemctl -w net.core.{option} = {value}
 #永久生效-需要修改: /etc/sysctl.conf
 sysctl -p
 
-备注：有些参数的生效需要刷新路由信息
-sysctl -w net.ipv4.route.flush=1
 ```
+> 备注：有些参数的生效需要刷新路由信息
+> sysctl -w net.ipv4.route.flush=1
 
 #### 性能验证：   
 ```
