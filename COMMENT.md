@@ -21,10 +21,10 @@ net.ipv4.tcp_abort_on_overflow = 1
 ```
 
 ```
-net.ipv4.tcp_syncookies = 0
+net.ipv4.tcp_syncookies = 1
 当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击
 默认为0，表示关闭
-如果关闭，不能预防SYN FLOOD
+如果关闭，不能预防SYNC FLOOD
 ```
 
 ```
@@ -32,6 +32,13 @@ net.core.netdev_max_backlog = 102400
 已连接但是内核还没有通知应用层接收的最大连接数
 默认值缺失
 如果过小，在极端压力下会来不及Accept
+```
+
+```
+net.ipv4.tcp_max_orphans = 262144
+那些尚未收到客户端确认信息的连接（SYN消息）队列的长度
+默认为1024
+如果过小则容纳不了更多等待连接的网络连接
 ```
 
 ```
