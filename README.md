@@ -61,6 +61,7 @@ net.ipv4.tcp_synack_retries     = 2
 # TCP Backlog队列实际值 = min(somaxconn, tcp_max_syn_backlog, 应用层设置的backlog)
 net.core.somaxconn              = 16384 #全连接队列
 net.ipv4.tcp_max_syn_backlog    = 16384 #半连接队列
+# 0 表示如果 accept 队列满了，那么扔掉ACK ； 1表示如果accept队列满了，server发送一个 RST
 net.ipv4.tcp_abort_on_overflow  = 1
 # syncookies有三个值： 0表示关闭该功能； 1表示仅当半连接队列放不下时再启用它； 2表示无条件开启功能；
 net.ipv4.tcp_syncookies         = 1
