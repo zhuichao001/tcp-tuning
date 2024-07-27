@@ -11,6 +11,14 @@
 #include <arpa/inet.h>
 #include "common/address.h"
 
+/*
+ * Socket 阻塞模式下Close 时，主要的逻辑在 tcp_close() 里实现：
+ *     1. 如果接收缓冲区还有数据未读，会先把接收缓冲区的数据清空，然后给对端发一个 RST
+ *     2. 如果接收缓冲区是空的，那么就调用 tcp_send_fin():
+ *        a. 还有些数据没发出去，内核会把发送缓冲区最后一个数据块拿出来，然后置为 FIN
+ *        b. 等把发送缓冲区数据都发完，最后再执行四次挥手的第一次挥手（FIN包）
+ */
+
 
 void print_errno(const char * prefix) {
      printf("%s socket error: %s(errno: %d)\n", prefix, strerror(errno), errno);
