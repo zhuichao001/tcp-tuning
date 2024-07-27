@@ -48,8 +48,15 @@ net.core.wmem_default   = 65536
 net.core.rmem_max       = 16777216
 net.core.wmem_max       = 16777216
 
-#设置网卡队列大小
+# 设置网卡队列大小
 ifconfig eth0 txqueuelen 1000
+```
+#### 连接队列
+```
+#半连接队列大小
+net.ipv4.tcp_max_syn_backlog = 512
+#全连接队列大小
+net.core.somaxconn = 1024
 ```
 
 #### 建立连接
