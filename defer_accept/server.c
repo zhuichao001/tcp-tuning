@@ -11,6 +11,7 @@
 #include "common/address.h"
 
 
+//作用：预放全连接攻击；减少epoll系统调用
 void set_tcp_defer_accept(int sockfd, int timeout) {
     setsockopt(sockfd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, sizeof(timeout));
 }

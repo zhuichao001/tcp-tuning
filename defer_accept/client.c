@@ -11,7 +11,7 @@
 #include <arpa/inet.h>
 #include "common/address.h"
 
-
+//作用是ACK+first-datpacket一起发送，少一次握手
 void set_tcp_defer_accept(int sockfd, int timeout) {
     setsockopt(sockfd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, sizeof(timeout));
 }
