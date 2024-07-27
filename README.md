@@ -51,13 +51,6 @@ net.core.wmem_max       = 16777216
 # 设置网卡队列大小
 ifconfig eth0 txqueuelen 1000
 ```
-#### 连接队列
-```
-#半连接队列大小
-net.ipv4.tcp_max_syn_backlog = 512
-#全连接队列大小
-net.core.somaxconn = 1024
-```
 
 #### 建立连接
 ```
@@ -69,6 +62,7 @@ net.ipv4.tcp_synack_retries     = 2
 net.core.somaxconn              = 16384 #全连接队列
 net.ipv4.tcp_max_syn_backlog    = 16384 #半连接队列
 net.ipv4.tcp_abort_on_overflow  = 1
+# syncookies有三个值： 0表示关闭该功能； 1表示仅当半连接队列放不下时再启用它； 2表示无条件开启功能；
 net.ipv4.tcp_syncookies         = 1
 ```
 
