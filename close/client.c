@@ -11,7 +11,7 @@
 #include <arpa/inet.h>
 #include "common/address.h"
 
-/*
+/* Rererence: https://www.cnblogs.com/traditional/p/11806454.html
  * Socket 阻塞模式下Close 时，主要的逻辑在 tcp_close() 里实现：
  *     1. 如果接收缓冲区还有数据未读，会先把接收缓冲区的数据清空，然后给对端发一个 RST
  *     2. 如果接收缓冲区是空的，那么就调用 tcp_send_fin():
